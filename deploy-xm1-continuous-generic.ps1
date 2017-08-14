@@ -32,6 +32,7 @@ Param(
   [switch]$SkipDbOperations = $false
 )
 
+$ErrorActionPreference = "Stop"
 
 # If TempFolderName is not empty then use this, else use script dir. 
 if($TempFolderName){

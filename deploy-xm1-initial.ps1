@@ -29,7 +29,7 @@ Param(
   [Parameter(Mandatory=$True)]
   [string]$StorageAccountNameDeploy,
 
-  [Parameter(Mandatory=$True)]
+  [Parameter(Mandatory=$False)]
   [string]$KeyVaultAdminMailAddressOrObjectId, #if e-mail address supplied we assume get by ADUser, use ID supplied
 
   [Parameter(Mandatory=$False)]
@@ -50,13 +50,29 @@ if ( ! (test-path -pathtype leaf $PathToSitecoreLicenseFile)) {
 }
 
 # If the KeyVaultAdminMailAddressOrObjectId is an e-mailaddress
-if ($KeyVaultAdminMailAddressOrObjectId -match ".+\@.+\..+"){
-  $KeyVaultUserId = (Get-AzureRmADUser -Mail "$KeyVaultAdminMailAddress" | Select -Expand Id).ToString()
-  Write-Host "Keyvault Admin User ID selected via e-mail: $KeyVaultUserId"
-}else{
-   $KeyVaultUserId = $KeyVaultAdminMailAddressOrObjectId
-   Write-Host "Using the Keyvault ObjectId supplied in arguments: $KeyVaultUserId"
+
+if($KeyVaultAdminMailAddressOrObjectId)
+{
+  if ($KeyVaultAdminMailAddressOrObjectId -match ".+\@.+\..+"){
+    $KeyVaultUserId = (Get-AzureRmADUser -Mail "$KeyVaultAdminMailAddressOrObjectId" | Select -Expand Id).ToString()
+    Write-Host "Keyvault Admin User ID selected via e-mail: $KeyVaultUserId"
+  }else{
+    #we assume it's an ServicePrincipal ObjectId or a User ObjectId - Application ID will not work
+    Write-Host "KeyVaultAdminMailAddressOrObjectId passed in argument as ID"
+    $KeyVaultUserId = $KeyVaultAdminMailAddressOrObjectId
+  }
 }
+else{
+   $account = $(Get-AzureRmContext).Account
+   Write-Host "Account type: $account"
+   if($account.AccountType -eq "User"){
+      $KeyVaultUserId = $(Get-AzureRmADUser -UserPrincipalName $account.Id).Id
+      Write-Host "Using the Keyvault ObjectId gotten via current user context: $KeyVaultUserId"
+   }else{
+      throw "Current context is probably a Service Principal. Are you running this in VSTS? Please supply the VSTS Service principal ObjectId through argument -KeyVaultAdminMailAddressOrObjectId"
+   }
+}
+
 
 #when running local code, use relative path to script, if on VSTS, the artifacts dir is different
 if ($ArtifactsRootDir){
