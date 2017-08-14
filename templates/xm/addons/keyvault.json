@@ -1,0 +1,374 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "variables": {
+    "webApiVersion": "2016-08-01",
+    "cmWebAppNameTidy": "[toLower(trim(parameters('standard').cmWebAppName))]",
+    "cdWebAppNameTidy": "[toLower(trim(parameters('standard').cdWebAppName))]",
+    "coreDbNameTidy": "[toLower(trim(parameters('standard').coreSqlDatabaseName))]",
+    "webDbNameTidy": "[toLower(trim(parameters('standard').webSqlDatabaseName))]",
+    "masterDbNameTidy": "[toLower(trim(parameters('standard').masterSqlDatabaseName))]",
+    "searchServiceNameTidy": "[toLower(trim(parameters('standard').searchServiceName))]",
+    "redisCacheNameTidy": "[toLower(trim(parameters('standard').redisCacheName))]",
+    "appInsightsNameTidy": "[toLower(trim(parameters('standard').applicationInsightsName))]",
+    "keyVaultName": "[concat(parameters('standard').deploymentId, '-kv')]"
+  },
+  "parameters": {
+    "standard": {
+      "type": "secureObject"
+    },
+    "extension": {
+      "type": "secureObject"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.KeyVault/vaults",
+      "name": "[variables('keyVaultName')]",
+      "apiVersion": "2015-06-01",
+      "location": "[parameters('standard').location]",
+      "tags": {
+        "displayName": "KeyVault"
+      },
+      "properties": {
+        "enabledForDeployment": "false",
+        "enabledForTemplateDeployment": "true",
+        "enabledForVolumeEncryption": "false",
+        "tenantId": "[subscription().tenantId]",
+        "accessPolicies": [
+          {
+            "tenantId": "[subscription().tenantId]",
+            "objectId": "[parameters('extension').userIdforKeyvault]",
+            "permissions": {
+              "keys": [
+                "Get",
+                "List",
+                "Update",
+                "Create",
+                "Import",
+                "Delete",
+                "Backup",
+                "Restore"
+              ],
+              "secrets": [
+                "All"
+              ],
+              "certificates": [
+                "All"
+              ]
+            }
+          }
+        ],
+        "sku": {
+          "name": "[parameters('extension').keyvaultSku]",
+          "family": "A"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(variables('keyVaultName'), '/sitecoreAdminPassword')]",
+      "apiVersion": "2015-06-01",
+      "properties": {
+        "value": "[parameters('standard').sitecoreAdminPassword]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(variables('keyVaultName'), '/cmCoreSqlDatabaseUserName')]",
+      "apiVersion": "2015-06-01",
+      "properties": {
+        "value": "[parameters('standard').cmCoreSqlDatabaseUserName]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(variables('keyVaultName'), '/cmCoreSqlDatabasePassword')]",
+      "apiVersion": "2015-06-01",
+      "properties": {
+        "value": "[parameters('standard').cmCoreSqlDatabasePassword]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(variables('keyVaultName'), '/cmMasterSqlDatabaseUserName')]",
+      "apiVersion": "2015-06-01",
+      "properties": {
+        "value": "[parameters('standard').cmMasterSqlDatabaseUserName]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(variables('keyVaultName'), '/cmMasterSqlDatabasePassword')]",
+      "apiVersion": "2015-06-01",
+      "properties": {
+        "value": "[parameters('standard').cmMasterSqlDatabasePassword]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(variables('keyVaultName'), '/cmWebSqlDatabaseUserName')]",
+      "apiVersion": "2015-06-01",
+      "properties": {
+        "value": "[parameters('standard').cmWebSqlDatabaseUserName]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(variables('keyVaultName'), '/cmWebSqlDatabasePassword')]",
+      "apiVersion": "2015-06-01",
+      "properties": {
+        "value": "[parameters('standard').cmWebSqlDatabasePassword]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(variables('keyVaultName'), '/cdCoreSqlDatabaseUserName')]",
+      "apiVersion": "2015-06-01",
+      "properties": {
+        "value": "[parameters('standard').cdCoreSqlDatabaseUserName]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(variables('keyVaultName'), '/cdCoreSqlDatabasePassword')]",
+      "apiVersion": "2015-06-01",
+      "properties": {
+        "value": "[parameters('standard').cdCoreSqlDatabasePassword]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(variables('keyVaultName'), '/cdWebSqlDatabaseUserName')]",
+      "apiVersion": "2015-06-01",
+      "properties": {
+        "value": "[parameters('standard').cdWebSqlDatabaseUserName]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(variables('keyVaultName'), '/cdWebSqlDatabasePassword')]",
+      "apiVersion": "2015-06-01",
+      "properties": {
+        "value": "[parameters('standard').cdWebSqlDatabasePassword]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(variables('keyVaultName'), '/securityClientIp')]",
+      "apiVersion": "2015-06-01",
+      "properties": {
+        "value": "[parameters('standard').securityClientIp]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(variables('keyVaultName'), '/securityClientIpMask')]",
+      "apiVersion": "2015-06-01",
+      "properties": {
+        "value": "[parameters('standard').securityClientIpMask]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(variables('keyVaultName'), '/sqlServerLogin')]",
+      "apiVersion": "2015-06-01",
+      "properties": {
+        "value": "[parameters('standard').sqlServerLogin]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
+      ]
+    },
+     {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(variables('keyVaultName'), '/sqlServerPassword')]",
+      "apiVersion": "2015-06-01",
+      "properties": {
+        "value": "[parameters('standard').sqlServerPassword]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
+      ]
+    },
+     {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(variables('keyVaultName'), '/webSqlServerLogin')]",
+      "apiVersion": "2015-06-01",
+      "properties": {
+        "value": "[parameters('standard').webSqlServerLogin]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
+      ]
+    },
+     {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(variables('keyVaultName'), '/webSqlServerPassword')]",
+      "apiVersion": "2015-06-01",
+      "properties": {
+        "value": "[parameters('standard').webSqlServerPassword]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
+      ]
+    },
+     {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(variables('keyVaultName'), '/searchServiceApiKey')]",
+      "apiVersion": "2015-06-01",
+      "properties": {
+        "value": "[listAdminKeys(resourceId('Microsoft.Search/searchServices', parameters('standard').searchServiceName), '2015-08-19').primaryKey]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(variables('keyVaultName'), '/appInsightsInstrumentationKey')]",
+      "apiVersion": "2015-06-01",
+      "properties": {
+        "value": "[reference(resourceId('Microsoft.Insights/Components', parameters('standard').applicationInsightsName), '2015-05-01').InstrumentationKey]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
+      ]
+    },
+      {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(variables('keyVaultName'), '/redisPassword')]",
+      "apiVersion": "2015-06-01",
+      "properties": {
+        "value": "[listKeys(resourceId('Microsoft.Cache/Redis', variables('redisCacheNameTidy')), '2016-04-01').primaryKey]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(variables('keyVaultName'), '/passwordSalt')]",
+      "apiVersion": "2015-06-01",
+      "properties": {
+        "value": "[parameters('standard').passwordSalt]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
+      ]
+    }
+  ],
+  "outputs": {
+    "deploymentId": {
+      "type": "string",
+      "value": "[parameters('standard').deploymentId]"
+    },
+    "cmWebAppNameTidy": {
+      "type": "string",
+      "value": "[variables('cmWebAppNameTidy')]"
+    },
+    "cdWebAppNameTidy": {
+      "type": "string",
+      "value": "[variables('cdWebAppNameTidy')]"
+    },
+    "coreDbNameTidy": {
+      "type": "string",
+      "value": "[variables('coreDbNameTidy')]"
+    },
+    "webDbNameTidy": {
+      "type": "string",
+      "value": "[variables('webDbNameTidy')]"
+    },
+    "masterDbNameTidy": {
+      "type": "string",
+      "value": "[variables('masterDbNameTidy')]"
+    },
+    "searchServiceNameTidy": {
+      "type": "string",
+      "value": "[variables('searchServiceNameTidy')]"
+    },
+    "redisCacheNameTidy": {
+      "type": "string",
+      "value": "[variables('redisCacheNameTidy')]"
+    },
+    "redisCacheHostName": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Cache/Redis', variables('redisCacheNameTidy')), '2016-04-01').hostName]"
+    },
+    "redisCacheSSLPort": {
+      "type": "int",
+      "value": "[reference(resourceId('Microsoft.Cache/Redis', variables('redisCacheNameTidy')), '2016-04-01').sslPort]"
+    },
+    "appInsightsNameTidy": {
+      "type": "string",
+      "value": "[variables('appInsightsNameTidy')]"
+    },
+    "keyVaultName": {
+      "type": "string",
+      "value": "[variables('keyVaultName')]"
+    },
+    "location": {
+      "type": "string",
+      "value": "[parameters('standard').location]"
+    },
+    "sqlServerName": {
+      "type": "string",
+      "value": "[parameters('standard').sqlServerName]"
+    },
+    "webSqlServerName": {
+      "type": "string",
+      "value": "[parameters('standard').webSqlServerName]"
+    },
+    "cdHostingPlanName": {
+      "type": "string",
+      "value": "[parameters('standard').cdHostingPlanName]"
+    },
+    "sqlServerFqdn":{
+      "type" : "string",
+      "value" : "[parameters('standard').infrastructure.sqlServerFqdn]"
+    },
+    "webSqlServerFqdn":{
+      "type" : "string",
+      "value" : "[parameters('standard').infrastructure.webSqlServerFqdn]"
+    }
+  }
+}

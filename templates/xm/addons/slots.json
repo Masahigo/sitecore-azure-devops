@@ -1,0 +1,111 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "variables": {
+    "webApiVersion": "2016-08-01",
+    "cmWebAppNameTidy": "[toLower(trim(parameters('standard').cmWebAppName))]",
+    "cdWebAppNameTidy": "[toLower(trim(parameters('standard').cdWebAppName))]",
+    "coreDbNameTidy": "[toLower(trim(parameters('standard').coreSqlDatabaseName))]",
+    "webDbNameTidy": "[toLower(trim(parameters('standard').webSqlDatabaseName))]",
+    "masterDbNameTidy": "[toLower(trim(parameters('standard').masterSqlDatabaseName))]",
+    "searchServiceNameTidy": "[toLower(trim(parameters('standard').searchServiceName))]",
+    "redisCacheNameTidy": "[toLower(trim(parameters('standard').redisCacheName))]",
+    "appInsightsNameTidy": "[toLower(trim(parameters('standard').applicationInsightsName))]",
+    "cmSlotName": "[concat(toLower(trim(parameters('standard').cmWebAppName)), '-preprod')]",
+    "cdSlotName": "[concat(toLower(trim(parameters('standard').cdWebAppName)), '-preprod')]"
+  },
+  "parameters": {
+    "standard": {
+      "type": "secureObject"
+    },
+    "extension": {
+      "type": "secureObject"
+    }
+  },
+  "resources": [
+      {
+          "name": "[concat(variables('cmWebAppNameTidy'), '/', variables('cmSlotName'))]",
+          "type": "Microsoft.Web/sites/slots",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2015-08-01",
+          "dependsOn": [],
+          "properties": {},
+          "resources": [
+            {
+              "type": "config",
+              "apiVersion": "2015-08-01",
+              "name": "web",
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/sites/slots', variables('cmWebAppNameTidy'), variables('cmSlotName'))]"
+              ],
+              "properties": {
+                "siteConfig": {
+                  "use32BitWorkerProcess": false,
+                  "alwaysOn": true,
+                  "phpVersion": "",
+                  "defaultDocuments": [
+                    "index.html"
+                  ]
+                }
+              }
+            },
+            {
+              "apiVersion": "[variables('webApiVersion')]",
+              "type": "config",
+              "name": "appsettings",
+              "dependsOn": [
+                 "[resourceId('Microsoft.Web/sites/slots', variables('cmWebAppNameTidy'), variables('cmSlotName'))]"
+              ],
+              "properties": {}
+            }
+          ]
+        },
+         {
+          "name": "[concat(variables('cdWebAppNameTidy'), '/', variables('cdSlotName'))]",
+          "type": "Microsoft.Web/sites/slots",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2015-08-01",
+          "dependsOn": [],
+          "properties": {},
+          "resources": [
+            {
+              "type": "config",
+              "apiVersion": "2015-08-01",
+              "name": "web",
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/sites/slots', variables('cdWebAppNameTidy'), variables('cdSlotName'))]"
+              ],
+              "properties": {
+                "siteConfig": {
+                  "use32BitWorkerProcess": false,
+                  "alwaysOn": true,
+                  "phpVersion": "",
+                  "defaultDocuments": [
+                    "index.html"
+                  ]
+                }
+              }
+            },
+            {
+              "apiVersion": "[variables('webApiVersion')]",
+              "type": "config",
+              "name": "appsettings",
+              "dependsOn": [
+                 "[resourceId('Microsoft.Web/sites/slots', variables('cdWebAppNameTidy'), variables('cdSlotName'))]"
+              ],
+              "properties": {}
+            }
+          ]
+        }
+  ],
+  "outputs": {
+    "cmSlotName" : {
+        "type": "string",
+        "value": "[variables('cmSlotName')]"
+    },
+    "cdSlotName" : {
+        "type": "string",
+        "value": "[variables('cdSlotName')]"
+    }
+  }
+}
