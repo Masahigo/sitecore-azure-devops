@@ -1,4 +1,4 @@
-# Sitecore 8.2u3 DevOps Scripts by Christof Claessens <christoc@microsoft.com> and Katrien De Graeve <Katrien.DeGraeve@microsoft.com>
+# Sitecore 8.2u3 DevOps Scripts by Christof Claessens and Katrien De Graeve
 
 _Disclaimer: This Sample Code is provided for the purpose of illustration only and is not intended to be used in a production environment._ 
 
