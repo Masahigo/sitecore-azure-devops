@@ -1,6 +1,6 @@
 # Sitecore 8.2u5 DevOps Scripts
 
-_Disclaimer: This Sample Code is provided for the purpose of illustration only and is not intended to be used in a production environment. Original scripts were done by Christof Claessens and Katrien De Graeve_ 
+_Disclaimer: This Sample Code is provided for the purpose of illustration only and is not intended to be used in a production environment. Original scripts and instructions were done by Christof Claessens and Katrien De Graeve_ 
 
 > **Configuring DevOps with VSTS** - Please see separte document ['Devops with VSTS guide'](vstsdevops.MD) for more details on properly setting up VSTS devops flow.
 
