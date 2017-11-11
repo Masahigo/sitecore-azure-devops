@@ -287,6 +287,17 @@
     },
     {
       "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(variables('keyVaultName'), '/telerikEncryptionKey')]",
+      "apiVersion": "2015-06-01",
+      "properties": {
+        "value": "[parameters('standard').telerikEncryptionKey]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
       "name": "[concat(variables('keyVaultName'), '/passwordSalt')]",
       "apiVersion": "2015-06-01",
       "properties": {

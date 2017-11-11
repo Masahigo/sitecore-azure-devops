@@ -83,6 +83,7 @@ $CmSlotName = $slotsOutParams.cmSlotName.Value
 $CdSlotName = $slotsOutParams.cdSlotName.Value
 $SqlServerFqdn = $outParams.sqlServerFqdn.Value
 $WebSqlServerFqdn = $outParams.webSqlServerFqdn.Value
+$CdWebAppFqdn = $outParams.cdWebAppFqdn.Value
 $SqlServerLogin = (Get-AzureKeyVaultSecret -VaultName $keyVaultName -Name sqlServerLogin).SecretValueText
 $SqlServerPwd = (Get-AzureKeyVaultSecret -VaultName $keyVaultName -Name sqlServerPassword).SecretValueText
 $CoreDBName = $outParams.coreDbNameTidy.Value
@@ -96,8 +97,7 @@ $CmWebDbLogin = (Get-AzureKeyVaultSecret -VaultName $keyVaultName -Name cmWebSql
 $CmWebDbPwd = (Get-AzureKeyVaultSecret -VaultName $keyVaultName -Name cmWebSqlDatabasePassword).SecretValueText
 $SearchServiceName = $outParams.searchServiceNameTidy.Value
 $SearchApiKey = (Get-AzureKeyVaultSecret -VaultName $keyVaultName -Name searchServiceApiKey).SecretValueText
-
-
+$telerikEncryptionKey = (Get-AzureKeyVaultSecret -VaultName $keyVaultName -Name telerikEncryptionKey).SecretValueText
 
 # Declare and then create the XML files on disk
 Write-Host "Finished loading from out params"
@@ -140,9 +140,11 @@ $setParamsCM = @"
   <setParameter name="Application Insights Instrumentation Key" value="$AppInsightsInstrumentationKey"/>
   <setParameter name="Application Insights Role" value="CM"/>
   <setParameter name="KeepAlive Url" value="$CM_KeepAliveUrl"/>
+  <setParameter name="Social Link Domain" value="$CdWebAppFqdn"/>
   <setParameter name="License Xml" value="$licenseEncoded"/>
   <setParameter name="IP Security Client IP" value="0.0.0.0" />
   <setParameter name="IP Security Client IP Mask" value="0.0.0.0" />
+  <setParameter name="Telerik Encryption Key" value="$telerikEncryptionKey"/>
 </parameters>
 "@
 
