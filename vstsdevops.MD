@@ -1,8 +1,8 @@
-# Sitecore XM 8.2u3 - DevOps with VSTS guide
+# Sitecore XM 8.2u5 - DevOps with VSTS guide
 
 _Disclaimer: This Sample Code is provided for the purpose of illustration only and is not intended to be used in a production environment._ 
 
-This document provides a step-by-step guide to leveraging Visual Studio Team Services to setup a continuous build and release pipeline based on Sitecore 8.2u3. It does not include a full pipeline that you would have in a real world case, but a good starting point.
+This document provides a step-by-step guide to leveraging Visual Studio Team Services to setup a continuous build and release pipeline based on Sitecore 8.2u5. It does not include a full pipeline that you would have in a real world case, but a good starting point.
 
 Authors: Christof Claessens and Katrien De Graeve - code samples and guide provided for learning purposes, without any warranties
 
@@ -117,4 +117,4 @@ This Release pipeline will be run every time you are publishing a new version of
 For the dev Environment you should have a set of tasks like this:   
 ![alt text](images/release-incremental.png "VSTS")
 
-Next steps are to add environments, add steps in between the dev environment to backup database, swap slots and more. Hopefully this guide was useful to kickstart your devops process for Sitecore 8.2u3 on Azure PaaS.
+Next steps are to add environments, add steps in between the dev environment to backup database, swap slots and more. Hopefully this guide was useful to kickstart your devops process for Sitecore 8.2u5 on Azure PaaS.

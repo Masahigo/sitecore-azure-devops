@@ -1,5 +1,5 @@
 #
-# Deploys a Sitecore ms deploy (web deploy) package to Sitecore 8.2u3 CD and CM slots
+# Deploys a Sitecore ms deploy (web deploy) package to Sitecore 8.2u5 CD and CM slots
 # Makes assumptions that both the keyvault and slots addon where configured and deployed
 # Most information is inferred automatically from keyvault and deployment output params
 # These should have been provisioned by "./deploy-xm-initial.ps1"

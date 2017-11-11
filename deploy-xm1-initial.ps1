@@ -1,5 +1,5 @@
 #
-# Deploy Sitecore 8.2u3 xM1 infrastructure components on ASP - leverage original ARM as shared on
+# Deploy Sitecore 8.2u5 xM1 infrastructure components on ASP - leverage original ARM as shared on
 # https://github.com/Sitecore/Sitecore-Azure-Quickstart-Templates/tree/master/Sitecore%208.2.3
 #
 
@@ -112,15 +112,15 @@ else{ Write-Host "Storage account found: $StorageAccountNameDeploy"}
 $ctx = $storageAccount.Context
 
 # Create container to upload packages towards
-$packagesContainerName = "tempsitecore823packages"
+$packagesContainerName = "tempsitecore825packages"
 $packagesContainer = New-AzureStorageContainer -Name $packagesContainerName -Permission Off -Context $ctx -ErrorAction SilentlyContinue
 
 # Upload XM1 package to container, so it is available for ARM deployment
-$cmBlobName = "Sitecore 8.2 rev. 170407_cm.scwdp.zip"
+$cmBlobName = "Sitecore 8.2 rev. 170728_cm.scwdp.zip"
 $localFile = "$scriptDir\packages\xM1\" + $cmBlobName
 Set-AzureStorageBlobContent -Container $packagesContainerName -File $localFile -Blob $cmBlobName -Context $ctx -Force
 
-$cdBlobName = "Sitecore 8.2 rev. 170407_cd.scwdp.zip"
+$cdBlobName = "Sitecore 8.2 rev. 170728_cd.scwdp.zip"
 $localCdFile = "$scriptDir\packages\xM1\" + $cdBlobName
 Set-AzureStorageBlobContent -Container $packagesContainerName -File $localCdFile -Blob $cdBlobName -Context $ctx -Force
 
@@ -135,7 +135,7 @@ $cdWebdeployPackageUri = (Get-AzureStorageBlob -Blob $cdBlobName -Container $pac
 Write-Output "Blob URL and SAS - $cdWebdeployPackageUri"
 
 # Create container to upload templates towards
-$templatesContainerName = "tempsitecore823templates"
+$templatesContainerName = "tempsitecore825templates"
 $templatesContainerUri = "https://$StorageAccountNameDeploy.blob.core.windows.net/$templatesContainerName/"
 
 # Upload main template:

@@ -1,5 +1,5 @@
 #
-# Deploy Sitecore 8.2u3 xM1 infrastructure components on regular ASP - leverage original ARM as shared on
+# Deploy Sitecore 8.2u5 xM1 infrastructure components on regular ASP - leverage original ARM as shared on
 # https://github.com/Sitecore/Sitecore-Azure-Quickstart-Templates/tree/master/Sitecore%208.2.3
 #
 
@@ -44,7 +44,7 @@ Param(
 
 $ErrorActionPreference = "Stop"
 
-# 8.2u3 packages
+# 8.2u5 packages
 $CMPackageLocation = "$(Split-Path $MyInvocation.MyCommand.Path)\packages\xM1\Sitecore 8.2 rev. 170407_cm.scwdp.zip"
 $CDPackageLocation = "$(Split-Path $MyInvocation.MyCommand.Path)\packages\xM1\Sitecore 8.2 rev. 170407_cd.scwdp.zip"
 
