@@ -61,7 +61,7 @@ In the script, both modules are deployed by providing the `azuredeploy.json` wit
             "value": {
                 "items": [
                     {
-                        "templateLink": "https://storacctname.blob.core.windows.net/tempsitecore823templates/addons/keyvault.json?sv=..sastoken..",
+                        "templateLink": "https://storacctname.blob.core.windows.net/tempsitecore825templates/addons/keyvault.json?sv=..sastoken..",
                         "name": "keyvault",
                         "parameters": {
                             "keyvaultSku": "Standard",
@@ -69,7 +69,7 @@ In the script, both modules are deployed by providing the `azuredeploy.json` wit
                         }
                     },
                     {
-                        "templateLink": "https://storacctname.blob.core.windows.net/tempsitecore823templates/addons/slots.json?sv=..sastoken..",
+                        "templateLink": "https://storacctname.blob.core.windows.net/tempsitecore825templates/addons/slots.json?sv=..sastoken..",
                         "name": "slots",
                         "parameters": {}
                     }
