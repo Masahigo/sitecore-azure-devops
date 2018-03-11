@@ -27,7 +27,16 @@ Param(
   [string]$ArtifactsRootDir,
 
   [Parameter(Mandatory=$False)]
-  [string]$TempFolderName
+  [string]$TempFolderName,
+
+  [Parameter(Mandatory=$False)]
+  [string]$CMTargetHostname = "",
+
+  [Parameter(Mandatory=$False)]
+  [string]$CDTargetHostname = "",
+
+  [Parameter(Mandatory=$False)]
+  [string]$WebsiteRootHostname = ""
 
 )
 
@@ -98,11 +107,13 @@ $CmWebDbPwd = (Get-AzureKeyVaultSecret -VaultName $keyVaultName -Name cmWebSqlDa
 $SearchServiceName = $outParams.searchServiceNameTidy.Value
 $SearchApiKey = (Get-AzureKeyVaultSecret -VaultName $keyVaultName -Name searchServiceApiKey).SecretValueText
 $telerikEncryptionKey = (Get-AzureKeyVaultSecret -VaultName $keyVaultName -Name telerikEncryptionKey).SecretValueText
+$commonWebsiteRootHostname = "azurewebsites.net"
 
 # Declare and then create the XML files on disk
 Write-Host "Finished loading from out params"
 
 $CM_IISWebApplicationName = "$ResourcePrefix-cm"
+$CD_IISWebApplicationName = "$ResourcePrefix-cd"
 $CM_ApplicationPath = "$($CmWebAppName)__$($CmSlotName)"
 $SitecorePwd = (Get-AzureKeyVaultSecret -VaultName $keyVaultName -Name sitecoreAdminPassword).SecretValueText
 $CM_CoreDbLogin = (Get-AzureKeyVaultSecret -VaultName $keyVaultName -Name cmCoreSqlDatabaseUserName).SecretValueText
@@ -118,6 +129,29 @@ $WebConnString = "Encrypt=True;TrustServerCertificate=False;Data Source=$WebSqlS
 $CloudSearchConnString = "serviceUrl=https://$SearchServiceName.search.windows.net;apiVersion=2015-02-28;apiKey=$SearchApiKey"
 $AppInsightsInstrumentationKey = (Get-AzureKeyVaultSecret -VaultName $keyVaultName -Name appInsightsInstrumentationKey).SecretValueText
 $CM_KeepAliveUrl = "https://$CmWebAppName.azurewebsites.net/sitecore/service/keepalive.aspx"
+$CM_TargetHostName = $CM_IISWebApplicationName + '.$(rootHostName)'
+$CD_TargetHostName = $CD_IISWebApplicationName + '.$(rootHostName)'
+
+if($CMTargetHostname){
+  Write-Host "CMTargetHostname supplied: $CMTargetHostname"
+  $CM_TargetHostName = $CMTargetHostname
+}else{
+  Write-Host "CMTargetHostname is empty"
+}
+
+if($CDTargetHostname){
+  Write-Host "CDTargetHostname supplied: $CDTargetHostname"
+  $CD_TargetHostName = $CDTargetHostname
+}else{
+  Write-Host "CDTargetHostname is empty"
+}
+
+if($WebsiteRootHostname){
+  Write-Host "WebsiteRootHostname supplied: $WebsiteRootHostname"
+  $commonWebsiteRootHostname = $WebsiteRootHostname
+}else{
+  Write-Host "WebsiteRootHostname is empty"
+}
 
 $setParamsCM = @"
 <parameters>
@@ -145,6 +179,8 @@ $setParamsCM = @"
   <setParameter name="IP Security Client IP" value="0.0.0.0" />
   <setParameter name="IP Security Client IP Mask" value="0.0.0.0" />
   <setParameter name="Telerik Encryption Key" value="$telerikEncryptionKey"/>
+  <setParameter name="habitatWebsiteTargetHostname" value="$CM_TargetHostName" />
+  <setParameter name="commonWebsiteRootHostname" value="$commonWebsiteRootHostname" />
 </parameters>
 "@
 
@@ -187,6 +223,8 @@ $setParamsCD = @"
   <setParameter name="KeepAlive Url" value="$CD_KeepAliveUrl"/>
   <setParameter name="Redis Connection String" value="$RedisConnString"/>
   <setParameter name="License Xml" value="$licenseEncoded"/>
+  <setParameter name="habitatWebsiteTargetHostname" value="$CM_TargetHostName" />
+  <setParameter name="commonWebsiteRootHostname" value="$commonWebsiteRootHostname" />
 </parameters>
 "@
 
