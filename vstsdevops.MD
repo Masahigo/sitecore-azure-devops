@@ -123,6 +123,13 @@ This Release pipeline will be run every time you are publishing a new version of
 -SubscriptionName "$(dev.azure.SubscriptionName)" -RGName "$(dev.azure.ResourceGroupName)" -Location "$(dev.azure.ResourceGroupLocation)" -PathToSitecoreLicenseFile "$(System.ArtifactsDirectory)\MYBUILD1\baseprovisioning\$(general.LocalTempFolder)\$(dev.sitecore.LicenseFileName)" -ArtifactsRootDir "$(System.ArtifactsDirectory)\MYBUILD1\baseprovisioning" -TempFolderName "$(System.ArtifactsDirectory)\MYBUILD1\baseprovisioning\$(general.LocalTempFolder)" -SetParamsCmOutputFilePath "$(System.ArtifactsDirectory)\MYBUILD1\baseprovisioning\$(general.LocalTempFolder)\$(dev.sitecore.CmParamFilename)" -SetParamsCdOutputFilePath "$(System.ArtifactsDirectory)\MYBUILD1\baseprovisioning\$(general.LocalTempFolder)\$(dev.sitecore.CdParamFilename)"
 ```
 
+* Step 5.1 (OPTIONAL) - Add VSTS Task 'Azure PowerShell' to run 'recreate-slots-xm.ps1'. This will create staging slots for CM & CD roles right before the actual MSDeploy tasks. Here's an example of what we used for the script's arguments:
+
+```
+-SubscriptionName "$(dev.azure.SubscriptionName)" -RGName "$(dev.azure.ResourceGroupName)"
+```
+![alt text](images/release-incremental-recreacte-slots.png "VSTS")
+
 * Step 6 - CM Baseline re-deploy -  Add VSTS Task 'Azure PowerShell' to run 'deploy-xm1-continuous.ps1'. We will repeat this step 4 times (CM baseline, CM incremental, CD baseline, CD incremental). The parameters are similar except for passing on CD/CM packages, and the use of the -Role, -SkipDbOperations and -DoNotDeleteExistingFiles. Showing the full list for the first task here, then only the main differences for the next 3:  
 
 ```
