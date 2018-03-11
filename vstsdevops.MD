@@ -34,18 +34,39 @@ This build pipeline copies all PS1 and ARM templates from this sample repo (the 
 
 #### Part 2 - Build the custom Sitecore project (incremental)
 To build the custom project, our build pipeline leverages a custom VSTS Task. Please see `/sitecore-vsts-tasks/README.MD` file in order to install the Task on your VSTS account.
-This custom VSTS task takes one .sln solution containing multiple Sitecore projects, builds all of them and packages the result into a single, new webdeploy zip file. The built-in VSTS task does not do this.  (The alternate path to this step would be to leverage a set of gulp scripts like Habitat does: building every project, overlaying the files into a single location and packaging the result in a web deploy package.)
+This custom VSTS task leverages a set of gulp scripts like Habitat does: building every project, overlaying the files into a single location and packaging the result in a web deploy package.
 * Step 1 - Install the pre-requisite VSTS task: Please see `/sitecore-vsts-tasks/README.MD`
-* Step 2 - Create a new build pipeline in VSTS, based on the repo with your custom code (this one will get incrementally deployed).
-* Step 3 - Add VSTS task 'Get sources' from your custom Sitecore solution. Select the right project, repo and branch.
-* Step 4 - Add VSTS Task 'NuGet restore'.  
-![alt text](images/buildsc-nuget.png "VSTS")
-* Step 5 - Add VSTS custom task VstsSitecoreSingleWebDeploy (the one installed to VSTS in step 1)
-  * Parameter Solution Path: select your .sln file
+* Step 2 - Copy the needed files into your Helix solution from:
+`/helix solution/`
+* Step 3 - Create a new build pipeline in VSTS, based on the repo with your custom code (this one will get incrementally deployed).
+* Step 4 - Add VSTS task 'Get sources' from your custom Sitecore solution. Select the right project, repo and branch.
+* Step 5 - Add VSTS Task 'NuGet restore'.  
+![alt text](images/buildsc-nuget-new.png "VSTS")
+* Step 6 - Add VSTS Task `npm install gulp-cli`.
+  * Parameter Command: `custom`
+  * Parameter Command and arguments: `install gulp-cli -g`
+![alt text](images/buildsc-npm-install-gulp-cli.png "VSTS")
+* Step 7 - Add VSTS Task `npm install`.
+  * Parameter Command: `install`
+![alt text](images/buildsc-npm-install.png "VSTS")
+* Step 8 - Add VSTS Task `gulp CI-And-Prepare-Files-CM-CD`.
+  * Gulp File Path: `gulpfile-ci.js`
+  * Gulp Task(s): `CI-And-Prepare-Files-CM-CD`
+![alt text](images/buildsc-gulp-prepare-custom-packages.png "VSTS")
+* Step 9 - Add VSTS custom task VstsSitecoreSingleWebDeploy (the one installed to VSTS in step 1) for CM role
+  * Source Website Path: leave default value
+  * Web deploy package name: rename to `webdeploy_CM.zip`
   * Parameter Temp path: by default '$(Agent.BuildDirectory)\Temp'
   * Parameter Packages Output Dir: $(Build.ArtifactStagingDirectory)
   * Parameter Name for resulting Build Artifact: typically output or another name you choose  
-  ![alt text](images/buildsc-packagemulti.png "VSTS")
+  ![alt text](images/buildsc-packagemulti-cm.png "VSTS")
+* Step 10 - Add VSTS custom task VstsSitecoreSingleWebDeploy (the one installed to VSTS in step 1) for CD role
+  * Source Website Path: change to `$(Agent.BuildDirectory)\s\Deploy\WebsiteCD`
+  * Web deploy package name: rename to `webdeploy_CD.zip`
+  * Parameter Temp path: by default '$(Agent.BuildDirectory)\Temp'
+  * Parameter Packages Output Dir: $(Build.ArtifactStagingDirectory)
+  * Parameter Name for resulting Build Artifact: typically output or another name you choose  
+  ![alt text](images/buildsc-packagemulti-cd.png "VSTS")
 * Make sure to schedule a build and verify the resulting artifact that was published is indeed a webdeploy.zip package.
 
 ## Release pipeline
@@ -108,11 +129,11 @@ This Release pipeline will be run every time you are publishing a new version of
 ```
 
 * Step 7 - CM Incremental deploy -  Add VSTS Task Azure PowerShell to run 'deploy-xm1-continuous.ps1'.
-  * Important for the arguments to pass these:  `-PackageLocation "$(System.ArtifactsDirectory)\MYBUILD2\SitecoreWebDeployPackage\webdeploy.zip" -Role "CM" -DoNotDeleteExistingFiles` (and others that are required).
+  * Important for the arguments to pass these:  `-PackageLocation "$(System.ArtifactsDirectory)\MYBUILD2\SitecoreWebDeployPackage\webdeploy_CM.zip" -Role "CM" -DoNotDeleteExistingFiles` (and others that are required).
 * Step 8 - CD Baseline re-deploy -  Add VSTS Task Azure Powershell to run 'deploy-xm1-continuous.ps1'.
   * Important for the arguments to pass these:  `-Role "CD" -SkipDbOperations` (and others that are required).
 * Step 9 - CD Incremental deploy -  Add VSTS Task Azure Powershell to run 'deploy-xm1-continuous.ps1'.
-  * Important for the arguments to pass these:  `-Role "CD" -DoNotDeleteExistingFiles` (and others that are required).
+  * Important for the arguments to pass these:  `-PackageLocation "$(System.ArtifactsDirectory)\MYBUILD2\SitecoreWebDeployPackage\webdeploy_CD.zip" -Role "CD" -DoNotDeleteExistingFiles` (and others that are required).
 * Step 10 - Add VSTS Task Delete Files and refer to the temp directory to be cleaned.  
 For the dev Environment you should have a set of tasks like this:   
 ![alt text](images/release-incremental.png "VSTS")
