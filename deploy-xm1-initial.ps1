@@ -134,6 +134,14 @@ $cdWebdeployPackageUri = (Get-AzureStorageBlob -Blob $cdBlobName -Container $pac
 
 Write-Output "Blob URL and SAS - $cdWebdeployPackageUri"
 
+$sqlCompatibilityLevelBlobName = "SetCompatibilityLevel.scwdp.zip"
+$localSqlCompatibilityLevelFile = "$scriptDir\packages\" + $sqlCompatibilityLevelBlobName
+Set-AzureStorageBlobContent -Container $packagesContainerName -File $localSqlCompatibilityLevelFile -Blob $sqlCompatibilityLevelBlobName -Context $ctx -Force
+
+$sqlCompatibilityLeveldeployPackageUri = (Get-AzureStorageBlob -Blob $sqlCompatibilityLevelBlobName -Container $packagesContainerName -Context $ctx).ICloudBlob.Uri.AbsoluteUri + $packagesContainerSas
+
+Write-Output "Blob URL and SAS for SQL compatibility level - $sqlCompatibilityLeveldeployPackageUri"
+
 # Create container to upload templates towards
 $templatesContainerName = "tempsitecore825templates"
 $templatesContainerUri = "https://$StorageAccountNameDeploy.blob.core.windows.net/$templatesContainerName/"
@@ -175,6 +183,9 @@ $paramsFile = @{
         }
         'sqlServerPassword' =  @{
           value ="$SqlServerPwd"
+        }
+        'setCompatibilityLevelMsDeployPackageUrl' =  @{
+          value = "$sqlCompatibilityLeveldeployPackageUri"
         }
         'cmMsDeployPackageUrl' =  @{
           value = "$cmWebdeployPackageUri"
