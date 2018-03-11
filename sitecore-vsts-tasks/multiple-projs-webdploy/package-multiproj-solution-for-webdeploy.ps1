@@ -9,8 +9,17 @@
 
 [CmdletBinding()]
 Param(
+  #[Parameter(Mandatory=$True)]
+  #[string]$SolutionPath, #path to the solution file
+
   [Parameter(Mandatory=$True)]
-  [string]$SolutionPath, #path to the solution file
+  [string]$SourceWebsitePath,  #path to the msbuild output path (prebuilt using Gulp) for CM role
+
+  #[Parameter(Mandatory=$True)]
+  #[string]$SourceWebsiteCDPath,  #path to the msbuild output path (prebuilt using Gulp) for CD role
+
+  [Parameter(Mandatory=$True)]
+  [string]$PackageName,
 
   [Parameter(Mandatory=$False)]
   [string]$TempDir = "$(Split-Path $MyInvocation.MyCommand.Path)\temp",
@@ -45,28 +54,27 @@ $publishProfileText = @"
   </PropertyGroup>
 </Project>
 "@
+
+# Clean TempDir directory:
+Write-Host "Cleaning TempDir: $PackagTempDiresPath"
+Remove-Item $TempDir -Recurse -Force
+
 $publishProfileFilePath = "$TempDir\publishprofile.pubxml"
 mkdir "$TempDir" -ErrorAction SilentlyContinue
 $publishProfileText | Out-File "$publishProfileFilePath"
 Write-Host "Dynamic publish profile has been created at: $publishProfileFilePath"
 
-# Restore Nuget packages if asked (for local execution)
-if($ExecuteNuget -eq $true) {
-  Nuget.exe restore "$SolutionPath"
-}
+$msdeploy = "C:\Program Files (x86)\IIS\Microsoft Web Deploy V3\msdeploy.exe"
 
-# Compile the solution file and publish to file system (temp)
-Write-Host "Building the solution from: $SolutionPath and deploying to: $tempWebsitePath"
-  $buildExpression = "$msbuild `"$SolutionPath`" /p:DeployOnBuild=true /p:PublishProfile=`"$publishProfileFilePath`" /p:SkipExtraFilesOnServer=True /p:VisualStudioVersion=14.0"
-Write-Host "build expression: $buildExpression"
-Invoke-Expression $buildExpression
-Write-Host "Solution at $SolutionPath has been build and published."
+#Instead of building the solution here copy the entire content from build output done via Gulp
+Write-Host "Copying the source from: $SourceWebsitePath and to: $TempDir with DoNotDeleteRule"
+$msDeployExpression = "& '$msdeploy' --% -verb:sync -enableRule:DoNotDeleteRule -source:dirPath=`"$SourceWebsitePath`" -dest:dirPath=`"$TempDir`""
+Invoke-Expression $msDeployExpression
+Write-Host "Website from $SourceWebsitePath has been copied."
 
 # Package up the directory in which all build output is layered, into a webdeploy package:
-$msdeploy = "C:\Program Files (x86)\IIS\Microsoft Web Deploy V3\msdeploy.exe"
-$packagename = $PackageOutputDir + "\webdeploy.zip"
+$packagename = $PackageOutputDir + "\" + $PackageName
 mkdir $PackageOutputDir -ErrorAction SilentlyContinue
-# Remove-Item $packagename -ErrorAction SilentlyContinue
 
 # Create package manifest on the fly:
 $packageManifestText = @"
@@ -80,6 +88,8 @@ $packageManifestText | Out-File "$packageManifestFilePath"
 Write-Host "Dynamic package manifest has been created at: $packageManifestFilePath"
 
 $declareParamUnicornPath = "-declareParam:name=unicornPath,kind=XmlFile,scope=`".*\.config`$`",match=`"//sitecore/unicorn/configurations/configuration/targetDataStore/@physicalRootPath`",defaultValue=`"D:\home\site\wwwroot\App_Data\unicorn`""
+$declareHabitatWebsiteTargetHostName = "-declareParam:name=habitatWebsiteTargetHostname,kind=XmlFile,scope=`".*\.config`$`",match=`"//sitecore/sites/site[@name='habitat']/@targetHostName`""
+$declareCommonWebsiteTargetHostName = "-declareParam:name=commonWebsiteRootHostname,kind=XmlFile,scope=`".*\.config`$`",match=`"//sitecore/sc.variable[@name='rootHostName']/@value`",defaultValue=`"azurewebsites.net`""
 
 $EscapedTempDir = [Regex]::Escape($TempDir)
 
@@ -89,7 +99,7 @@ if($PackageForExclusiveUseByVSTSOOBWebAppReleaseTask -eq $True){
   $declareIISWebAppName = "-declareParam:name=`"IIS Web Application Name`",kind=`"ProviderPath`",scope=`"IisApp`",match=`"^$($EscapedTempDir)$`",defaultValue=`"Default Web Site/Contents`",tags=IisApp"
 }
 
-$msdeploycommandToCreatePackage = $("-verb:sync -enableRule:DoNotDeleteRule -source:manifest=`"{0}`" -dest:package=`"{1}`" {2} {3}" -f $packageManifestFilePath, $packagename, $declareParamUnicornPath, $declareIISWebAppName)
+$msdeploycommandToCreatePackage = $("-verb:sync -enableRule:DoNotDeleteRule -source:manifest=`"{0}`" -dest:package=`"{1}`" {2} {3} {4} {5}" -f $packageManifestFilePath, $packagename, $declareParamUnicornPath, $declareIISWebAppName, $declareHabitatWebsiteTargetHostName, $declareCommonWebsiteTargetHostName)
 
 Write-Output "MS Deploy command about to be executed to create package: " $msdeploycommandToCreatePackage
 

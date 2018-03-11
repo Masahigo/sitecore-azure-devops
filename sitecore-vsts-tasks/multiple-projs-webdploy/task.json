@@ -1,9 +1,9 @@
 {
   "id": "801a3d7b-7182-4286-8b27-a13e3286551c",
-  "name": "VstsSitecorePackageMultiProj",
-  "friendlyName": "Package multi-proj in single WebDeploy",
-  "description": "Takes a solution file with multiple projects and packages into one single solution, includes Unicorn param.",
-  "author": "Christof Claessens",
+  "name": "VstsSitecorePackageGulpBuild",
+  "friendlyName": "Package build in single WebDeploy",
+  "description": "Takes build outputs (created via Gulp), includes Unicorn param and additional params for setting correct values for targetHostName & rootHostName plus forcing custom SQL provider for WFFM in Sitecore configs.",
+  "author": "Masi Malmi",
   "helpMarkDown": "no help provided",
   "category": "Utility",
   "visibility": [
@@ -12,20 +12,28 @@
   ],
   "demands": [],
   "version": {
-    "Major": "0",
-    "Minor": "1",
+    "Major": "1",
+    "Minor": "0",
     "Patch": "0"
   },
   "minimumAgentVersion": "1.95.0",
   "instanceNameFormat": "VstsSitecoreSingleWebDeploy $(message)",
   "inputs": [
     {
-      "name": "solutionPath",
-      "type": "filePath",
-      "label": "Solution Path",
-      "defaultValue": "",
+      "name": "sourceWebsitePath",
+      "type": "string",
+      "label": "Source Website Path",
+      "defaultValue": "$(Agent.BuildDirectory)\\s\\Deploy\\Website",
       "required": true,
-      "helpMarkDown": "Path to VSTS Sitecore Solution to build and create Web Deploy packages from."
+      "helpMarkDown": "Path to VSTS Sitecore Website build output folder from where to create Web Deploy package from."
+    },
+    {
+      "name": "packageName",
+      "type": "string",
+      "label": "Web deploy package name",
+      "defaultValue": "webdeploy.zip",
+      "required": true,
+      "helpMarkDown": "Web deploy package name (zip file)"
     },
     {
       "name": "tempDir",

@@ -8,9 +8,12 @@ param()
 
 Trace-VstsEnteringInvocation $MyInvocation
 try {
-    # Set the solution path:
-    $solutionPath = Get-VstsInput -Name solutionPath -Require
-    Write-Verbose "Sitecore solution path is set to '$solutionPath'."
+    # Set the source website path:
+    $sourceWebsitePath = Get-VstsInput -Name sourceWebsitePath -Require
+    Write-Verbose "Source web site path is set to '$sourceWebsitePath'."
+
+    $packageName = Get-VstsInput -Name packageName -Require
+    Write-Verbose "Package name is set to '$packageName'."
 
     # Set temp path:
     $tempPath = Get-VstsInput -Name tempDir
@@ -20,6 +23,7 @@ try {
 
     # Get artifact name to publish towards:
     $artifactName = Get-VstsInput -Name artifactName -Require
+    Write-Verbose "Artifact name is set to '$artifactName'."
     
     # Make sure temp path exists:
     if (Test-Path -LiteralPath $tempPath -PathType Container){
@@ -43,7 +47,7 @@ try {
     # import-module "Microsoft.TeamFoundation.DistributedTask.Task.Common"
 
     # Run:
-    & ".\package-multiproj-solution-for-webdeploy.ps1" -SolutionPath $solutionPath -TempDir $tempPath -PackageOutputDir $packagesOutputPath
+    & ".\package-multiproj-solution-for-webdeploy.ps1" -SourceWebsitePath $sourceWebsitePath -PackageName $packageName -TempDir $tempPath -PackageOutputDir $packagesOutputPath
 
     # Publish the resulting Web Deploy packages as build artifact:
     Write-VstsUploadArtifact -ContainerFolder "SitecoreWebDeployPackage" -Name $artifactName -Path $packagesOutputPath
