@@ -52,6 +52,7 @@ This custom VSTS task leverages a set of gulp scripts like Habitat does: buildin
 * Step 8 - Add VSTS Task `gulp CI-And-Prepare-Files-CM-CD`.
   * Gulp File Path: `gulpfile-ci.js`
   * Gulp Task(s): `CI-And-Prepare-Files-CM-CD`
+  * (See https://visionsincode.wordpress.com/2017/08/31/continuous-integration-and-deployment-of-sitecore-habitathelix-as-an-azure-web-app/ for more details)
 ![alt text](images/buildsc-gulp-prepare-custom-packages.png "VSTS")
 * Step 9 - Add VSTS custom task VstsSitecoreSingleWebDeploy (the one installed to VSTS in step 1) for CM role
   * Source Website Path: leave default value
