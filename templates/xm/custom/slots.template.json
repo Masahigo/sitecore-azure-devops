@@ -1,0 +1,109 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "variables": {
+    "webApiVersion": "2016-08-01",
+    "cmWebAppNameTidy": "[parameters('sitecoreProvOutput').cmWebAppNameTidy.value]",
+    "cdWebAppNameTidy": "[parameters('sitecoreProvOutput').cdWebAppNameTidy.value]",
+    "cmSlotName": "[concat(variables('cmWebAppNameTidy'), '-preprod')]",
+    "cdSlotName": "[concat(variables('cdWebAppNameTidy'), '-preprod')]"
+  },
+  "parameters": {
+    "sitecoreProvOutput": {
+      "type": "object"
+    },
+    "dummyParam": {
+      "type": "string"
+    }
+  },
+  "resources": [
+      {
+          "name": "[concat(variables('cmWebAppNameTidy'), '/', variables('cmSlotName'))]",
+          "type": "Microsoft.Web/sites/slots",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2015-08-01",
+          "dependsOn": [],
+          "properties": {},
+          "resources": [
+            {
+              "type": "config",
+              "apiVersion": "2015-08-01",
+              "name": "web",
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/sites/slots', variables('cmWebAppNameTidy'), variables('cmSlotName'))]"
+              ],
+              "properties": {
+                "siteConfig": {
+                  "use32BitWorkerProcess": false,
+                  "alwaysOn": true,
+                  "phpVersion": "",
+                  "defaultDocuments": [
+                    "index.html"
+                  ]
+                }
+              }
+            },
+            {
+              "apiVersion": "[variables('webApiVersion')]",
+              "type": "config",
+              "name": "appsettings",
+              "dependsOn": [
+                 "[resourceId('Microsoft.Web/sites/slots', variables('cmWebAppNameTidy'), variables('cmSlotName'))]"
+              ],
+              "properties": {
+                "WEBSITE_DYNAMIC_CACHE": 0
+              }
+            }
+          ]
+        },
+         {
+          "name": "[concat(variables('cdWebAppNameTidy'), '/', variables('cdSlotName'))]",
+          "type": "Microsoft.Web/sites/slots",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2015-08-01",
+          "dependsOn": [],
+          "properties": {},
+          "resources": [
+            {
+              "type": "config",
+              "apiVersion": "2015-08-01",
+              "name": "web",
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/sites/slots', variables('cdWebAppNameTidy'), variables('cdSlotName'))]"
+              ],
+              "properties": {
+                "siteConfig": {
+                  "use32BitWorkerProcess": false,
+                  "alwaysOn": true,
+                  "phpVersion": "",
+                  "defaultDocuments": [
+                    "index.html"
+                  ]
+                }
+              }
+            },
+            {
+              "apiVersion": "[variables('webApiVersion')]",
+              "type": "config",
+              "name": "appsettings",
+              "dependsOn": [
+                 "[resourceId('Microsoft.Web/sites/slots', variables('cdWebAppNameTidy'), variables('cdSlotName'))]"
+              ],
+              "properties": {
+                "WEBSITE_DYNAMIC_CACHE": 0
+              }
+            }
+          ]
+        }
+  ],
+  "outputs": {
+    "cmSlotName" : {
+        "type": "string",
+        "value": "[variables('cmSlotName')]"
+    },
+    "cdSlotName" : {
+        "type": "string",
+        "value": "[variables('cdSlotName')]"
+    }
+  }
+}
