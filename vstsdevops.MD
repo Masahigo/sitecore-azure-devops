@@ -128,7 +128,7 @@ This Release pipeline will be run every time you are publishing a new version of
 ```
 -SubscriptionName "$(dev.azure.SubscriptionName)" -RGName "$(dev.azure.ResourceGroupName)"
 ```
-![alt text](images/release-incremental-recreacte-slots.png "VSTS")
+![alt text](images/release-incremental-recreate-slots.png "VSTS")
 
 * Step 6 - CM Baseline re-deploy -  Add VSTS Task 'Azure PowerShell' to run 'deploy-xm1-continuous.ps1'. We will repeat this step 4 times (CM baseline, CM incremental, CD baseline, CD incremental). The parameters are similar except for passing on CD/CM packages, and the use of the -Role, -SkipDbOperations and -DoNotDeleteExistingFiles. Showing the full list for the first task here, then only the main differences for the next 3:  
 
