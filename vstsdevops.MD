@@ -68,7 +68,7 @@ This custom VSTS task leverages a set of gulp scripts like Habitat does: buildin
   * Parameter Packages Output Dir: $(Build.ArtifactStagingDirectory)
   * Parameter Name for resulting Build Artifact: typically output or another name you choose  
   ![alt text](images/buildsc-packagemulti-cd.png "VSTS")
-* Make sure to schedule a build and verify the resulting artifact that was published is indeed a webdeploy.zip package.
+* Make sure to schedule a build and verify the resulting artifact that was published is indeed two separate packages: webdeploy_CM.zip & webdeploy_CD.zip .
 
 ## Release pipeline
 
