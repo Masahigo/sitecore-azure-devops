@@ -2,7 +2,7 @@
   "id": "801a3d7b-7182-4286-8b27-a13e3286551c",
   "name": "VstsSitecorePackageGulpBuild",
   "friendlyName": "Package build in single WebDeploy",
-  "description": "Takes build outputs (created via Gulp), includes Unicorn param and additional params for setting correct values for targetHostName & rootHostName plus forcing custom SQL provider for WFFM in Sitecore configs.",
+  "description": "Takes build outputs (created via Gulp), includes Unicorn param and additional params for setting correct values for targetHostName & rootHostName in Sitecore configs.",
   "author": "Masi Malmi",
   "helpMarkDown": "no help provided",
   "category": "Utility",
