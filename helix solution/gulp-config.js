@@ -1,10 +1,10 @@
 module.exports = function () {
-  var instanceRoot = "C:\\websites\\gcp.dev.local";
+  var instanceRoot = "C:\\websites\\habitat.dev.local";
   var config = {
     websiteRoot: instanceRoot + "\\Website",
     sitecoreLibraries: instanceRoot + "\\Website\\bin",
     licensePath: instanceRoot + "\\Data\\license.xml",
-    solutionName: "GCP",
+    solutionName: "Habitat",
     buildConfiguration: "Debug",
     buildToolsVersion: 15.0,
     buildMaxCpuCount: 0,

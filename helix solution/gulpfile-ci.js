@@ -44,7 +44,7 @@ gulp.task("CI-Prepare-Package-Files", function (callback) {
       config.websiteRoot + "\\App_Config\\Include\\Unicorn\\*.DataProvider.config",
       config.websiteRoot + "\\App_Config\\Include\\{Feature,Foundation,Project}\\z.*DevSettings.config",
       "!" + config.websiteRoot + "\\bin\\Sitecore.Support*dll",
-      "!" + config.websiteRoot + "\\bin\\SSAB.GCP.{Feature,Foundation,Website}*dll"
+      "!" + config.websiteRoot + "\\bin\\Sitecore.{Feature,Foundation,Website}*dll"
     ];
     console.log(excludeList);
 
@@ -139,7 +139,7 @@ gulp.task("CI-Prepare-Files-CM", function (callback) {
         tempWebsite + "\\App_Config\\Include\\{Feature,Foundation,Project}\\z.*DevSettings.config",
         tempWebsite + "\\App_Data\\*",
         "!" + tempWebsite + "\\bin\\Sitecore.Support*dll",
-        "!" + tempWebsite + "\\bin\\SSAB.GCP.{Feature,Foundation,Project}*dll",
+        "!" + tempWebsite + "\\bin\\Habitat.{Feature,Foundation,Project}*dll",
         tempWebsite + "\\bin\\{Sitecore.Foundation.Installer}*",
         tempWebsite + "\\App_Config\\Include\\Foundation\\Foundation.Installer.config",
         tempWebsite + "\\App_Config\\Include\\Foundation\\Foundation.SitecoreExtensions.ThreadPool.config",
@@ -165,7 +165,7 @@ gulp.task("CI-Prepare-Files-CD", function (callback) {
         tempWebsiteCD + "\\App_Config\\Include\\{Feature,Foundation,Project}\\z.*DevSettings.config",
         tempWebsiteCD + "\\App_Data\\*",
         "!" + tempWebsiteCD + "\\bin\\Sitecore.Support*dll",
-        "!" + tempWebsiteCD + "\\bin\\SSAB.GCP.{Feature,Foundation,Project}*dll",
+        "!" + tempWebsiteCD + "\\bin\\Habitat.{Feature,Foundation,Project}*dll",
         tempWebsiteCD + "\\bin\\{Sitecore.Foundation.Installer}*",
         tempWebsiteCD + "\\App_Config\\Include\\Rainbow",
         tempWebsiteCD + "\\App_Config\\Include\\Unicorn",

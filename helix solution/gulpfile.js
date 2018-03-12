@@ -226,7 +226,7 @@ gulp.task("Publish-Project", function () {
 
 gulp.task("Publish-Assemblies", function () {
   var root = "./src";
-  var binFiles = root + "/**/code/**/bin/GCP.{Feature,Foundation,GCPSite}.*.{dll,pdb}";
+  var binFiles = root + "/**/code/**/bin/Sitecore.{Feature,Foundation,Habitat}.*.{dll,pdb}";
   var destination = config.websiteRoot + "/bin/";
   return gulp.src(binFiles, { base: root })
     .pipe(rename({ dirname: "" }))
@@ -313,7 +313,7 @@ gulp.task("Auto-Publish-Views", function () {
 gulp.task("Auto-Publish-Assemblies", function () {
   var root = "./src";
   var roots = [root + "/**/code/**/bin"];
-  var files = "/**/GCP.{Feature,Foundation,GCPSite}.*.{dll,pdb}";;
+  var files = "/**/Sitecore.{Feature,Foundation,Habitat}.*.{dll,pdb}";;
   var destination = config.websiteRoot + "/bin/";
   gulp.src(roots, { base: root }).pipe(
     foreach(function (stream, rootFolder) {
@@ -359,7 +359,7 @@ gulp.task("Package-Prepare-Package-Files", function (callback) {
       config.websiteRoot + "\\App_Config\\Include\\{Feature,Foundation,Project}\\*Serialization.config",
       config.websiteRoot + "\\App_Config\\Include\\{Feature,Foundation,Project}\\z.*DevSettings.config",
       "!" + config.websiteRoot + "\\bin\\Sitecore.Support*dll",
-      "!" + config.websiteRoot + "\\bin\\GCP.{Feature,Foundation,GCPSite,Common}*dll"
+      "!" + config.websiteRoot + "\\bin\\Sitecore.{Feature,Foundation,Habitat,Common}*dll"
     ];
     console.log(excludeList);
 
