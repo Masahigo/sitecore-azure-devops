@@ -126,7 +126,7 @@ $CM_WebDbLogin = (Get-AzureKeyVaultSecret -VaultName $keyVaultName -Name cmWebSq
 $CM_WebDbPwd = (Get-AzureKeyVaultSecret -VaultName $keyVaultName -Name cmWebSqlDatabasePassword).SecretValueText
 $WebAdminConnString = "Encrypt=True;TrustServerCertificate=False;Data Source=$WebSqlServerFqdn,1433;Initial Catalog=$WebDBName;User Id=$WebSqlServerLogin;Password=$WebSqlServerPwd"
 $WebConnString = "Encrypt=True;TrustServerCertificate=False;Data Source=$WebSqlServerFqdn,1433;Initial Catalog=$WebDBName;User Id=$CmWebDbLogin;Password=$CmWebDbPwd"
-$CloudSearchConnString = "serviceUrl=https://$SearchServiceName.search.windows.net;apiVersion=2015-02-28;apiKey=$SearchApiKey"
+$CloudSearchConnString = "serviceUrl=https://$SearchServiceName.search.windows.net;apiVersion=2015-02-28-preview;apiKey=$SearchApiKey"
 $AppInsightsInstrumentationKey = (Get-AzureKeyVaultSecret -VaultName $keyVaultName -Name appInsightsInstrumentationKey).SecretValueText
 $CM_KeepAliveUrl = "https://$CmWebAppName.azurewebsites.net/sitecore/service/keepalive.aspx"
 $CM_TargetHostName = $CM_IISWebApplicationName + '.$(rootHostName)'
